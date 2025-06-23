@@ -111,7 +111,6 @@
 </head>
 <body class="text-white font-sans pt-20">
 
-  <!-- Header -->
   <header class="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-center shadow-md bg-slate-900/90 backdrop-blur">
     <div class="flex items-center gap-2">
       <img src="pic.png" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10">
@@ -122,7 +121,6 @@
     </a>
   </header>
 
-  <!-- Ad Section -->
   <section class="text-center text-sm text-slate-300 p-3 border-b border-slate-700 bg-slate-800/30 backdrop-blur">
     <p>🔔 Sponsored: Place your ad here</p>
     <div class="mt-2 h-16 flex items-center justify-center rounded border border-dashed border-slate-400 bg-slate-700/40">
@@ -130,7 +128,6 @@
     </div>
   </section>
 
-  <!-- Main -->
   <main class="p-6 max-w-screen-xl mx-auto">
     <div class="flex flex-col lg:flex-row gap-6">
       <div class="flex-1">
@@ -146,7 +143,6 @@
     </div>
   </main>
 
-  <!-- Footer -->
   <footer class="mt-10 p-4 text-center text-sm text-slate-300 border-t border-slate-700 bg-slate-800/30 backdrop-blur">
     <p>No login required. Upload and recreate images freely.</p>
     <div class="mt-2 h-16 flex items-center justify-center rounded border border-dashed border-slate-500 bg-slate-700/40">
@@ -154,24 +150,20 @@
     </div>
   </footer>
 
-  <!-- Scroll to Top -->
   <button id="scrollTopBtn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">↑</button>
 
-  <!-- Modal for full image -->
   <div id="imageModal" class="modal flex">
     <span class="close" onclick="document.getElementById('imageModal').style.display='none'">&times;</span>
     <div class="modal-content" id="modalImageContainer"></div>
   </div>
 
-  <!-- Advertise Button -->
-  <a href="https://mail.google.com/mail/?view=cm&to=mrterfinslwiz@gmail.com&su=Need%20to%20Advertise"
+  <a href="https://mail.google.com/mail/?view=cm&to=mrterminalwiz@gmail.com&su=Need%20to%20Advertise"
      target="_blank"
      class="advertise-btn fixed bottom-5 left-5 z-[9999] text-white text-sm px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-all group">
     ✉️ Advertise Here
     <span class="tooltip group-hover:opacity-100">Place Your Ad Here!</span>
   </a>
 
-  <!-- Firebase & Gallery Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
@@ -197,21 +189,10 @@
         const entry = doc.data();
         const card = document.createElement("div");
         card.className = "card relative";
-        const imageId = doc.id;
-
-        const likeKey = `likes-${imageId}`;
-        const likedKey = `liked-${imageId}`;
-        const likeCount = parseInt(localStorage.getItem(likeKey)) || 0;
-        const alreadyLiked = localStorage.getItem(likedKey) === "true";
-        const heartIcon = alreadyLiked ? "❤️" : "🤍";
 
         card.innerHTML = `
           <img src="${entry.image}" alt="Uploaded Image" class="w-full h-64 object-cover cursor-pointer" onclick="showFullImage('${entry.image}')">
           <button onclick="recreate('${encodeURIComponent(entry.prompt)}')" class="recreate-btn">Recreate</button>
-          <div class="absolute top-2 right-2 flex items-center gap-1 bg-black/50 backdrop-blur px-2 py-1 rounded-full text-white text-sm">
-            <button onclick="toggleLike('${likeKey}', '${likedKey}', this)">${heartIcon}</button>
-            <span class="like-count">${likeCount}</span>
-          </div>
         `;
         gallery.appendChild(card);
       });
@@ -232,7 +213,6 @@
     };
   </script>
 
-  <!-- Extra Scripts -->
   <script>
     document.getElementById("imageModal").addEventListener("click", function (e) {
       if (e.target === this) this.style.display = "none";
@@ -243,38 +223,18 @@
       scrollBtn.style.display = window.scrollY > 300 ? "block" : "none";
     });
 
-    function toggleLike(likeKey, likedKey, btnElement) {
-      const countEl = btnElement.nextElementSibling;
-      let count = parseInt(countEl.textContent) || 0;
-      const isLiked = localStorage.getItem(likedKey) === "true";
-
-      if (isLiked) {
-        count--;
-        btnElement.textContent = "🤍";
-        localStorage.removeItem(likedKey);
-      } else {
-        count++;
-        btnElement.textContent = "❤️";
-        localStorage.setItem(likedKey, "true");
-      }
-
-      countEl.textContent = count;
-      localStorage.setItem(likeKey, count);
-    }
-
     window.onload = () => {
-      document.getElementById("year").textContent = new Date().getFullYear();
+      document.getElementById("year")?.textContent = new Date().getFullYear();
     };
   </script>
 
-  <!-- Footer -->
   <footer class="mt-12 bg-slate-900/90 backdrop-blur text-slate-300 text-sm border-t border-slate-700">
     <div class="max-w-screen-xl mx-auto px-6 py-8 flex flex-col items-center justify-center text-center gap-3">
       <div class="flex items-center gap-2 justify-center">
         <img src="pic.png" alt="WANOCRAFT Logo" class="w-8 h-8">
         <span class="text-white font-semibold text-lg">WANOCRAFT</span>
       </div>
-      <p>Made with ❤️ by Naz and Janz</p>
+      <p>Made with ❤️ by Pixel Syndicate</p>
       <p class="text-xs text-slate-400">&copy; <span id="year"></span> WANOCRAFT. All rights reserved.</p>
     </div>
   </footer>
