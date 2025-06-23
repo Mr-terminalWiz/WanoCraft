@@ -1,34 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc
-    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBkdD-8QDgx8vvJAGTgw9L44N4lFYUpvdI",
-      authDomain: "wanocraft-87029.firebaseapp.com",
-      projectId: "wanocraft-87029",
-      storageBucket: "wanocraft-87029.appspot.com",
-      messagingSenderId: "906067247166",
-      appId: "1:906067247166:web:fed594ed763161659ed16f",
-      measurementId: "G-FPBWQKZMZK"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const db = getFirestore(app);
-
-    window.firebaseDB = db;
-    window.addDoc = addDoc;
-    window.collection = collection;
-  </script>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Upload | WANoCRAFT</title>
@@ -38,18 +10,6 @@
       background: linear-gradient(to bottom, #0f172a, #1e3a8a, #4f46e5);
       font-family: 'Inter', sans-serif;
       color: #f1f5f9;
-    }
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(12px);
-      z-index: 1000;
-    }
-    main {
-      padding-top: 100px;
     }
     input, textarea {
       background-color: rgba(15, 23, 42, 0.7);
@@ -80,112 +40,117 @@
     }
   </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between">
+  <!-- Header -->
+  <header class="p-4 bg-slate-900/90 backdrop-blur text-white shadow-md w-full flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <img src="pic.png" alt="Logo" class="w-8 h-8" />
+      <span class="text-lg font-semibold">WANoCRAFT</span>
+    </div>
+    <a href="index.html" class="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-full transition">⬅ Back to Gallery</a>
+  </header>
 
-<header class="p-4 flex justify-between items-center">
-  <div class="flex items-center gap-2">
-    <img src="pic.png" alt="WANOCRAFT Logo" class="w-8 h-8 sm:w-10 sm:h-10" />
-    <h1 class="text-xl sm:text-2xl font-semibold text-white">WANoCRAFT</h1>
+  <!-- Upload Form -->
+  <main class="flex-grow flex items-center justify-center p-6">
+    <form onsubmit="handleUpload(event)" class="bg-white/10 backdrop-blur-lg p-8 rounded-xl w-full max-w-md border border-white/20 shadow-xl">
+      <h2 class="text-2xl font-semibold text-center mb-6 text-white">Upload Your Creation</h2>
+
+      <label for="prompt" class="block mb-2 text-sm font-medium text-blue-200">Prompt</label>
+      <textarea id="prompt" rows="4" placeholder="E.g., A robot samurai under cherry blossoms at sunset..." class="mb-5" required></textarea>
+
+      <label for="image" class="block mb-2 text-sm font-medium text-blue-200">Upload Image</label>
+      <div id="uploadArea" class="flex flex-col items-center justify-center border-2 border-dashed border-blue-300 rounded-xl mb-4 p-4 h-48 w-full bg-slate-800/30 cursor-pointer">
+        <input type="file" id="image" accept="image/*" required class="hidden" />
+        <label for="image" class="text-blue-100 text-center w-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto mb-2 h-8 w-8 text-blue-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l-4-4m4 4l4-4" />
+          </svg>
+          <span class="block text-sm font-medium">Click here to choose an image file</span>
+        </label>
+      </div>
+      <div id="previewContainer" class="mb-4 text-center"></div>
+
+      <div class="text-center">
+        <button type="submit" class="glow-btn">🚀 Upload</button>
+      </div>
+    </form>
+  </main>
+
+  <div id="uploadOverlay" class="fixed inset-0 bg-black/80 flex items-center justify-center text-white text-xl hidden z-50">
+    <span id="uploadStatus">Uploading... Please wait ⏳</span>
   </div>
-  <a href="index.html" class="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-4 py-2 rounded-md shadow transition">
-    Back to Gallery
-  </a>
-</header>
 
-<main class="p-6 min-h-screen flex flex-col items-center justify-center">
-  <h2 class="text-3xl font-bold mb-6 text-center text-blue-100">Upload Your Creation</h2>
+  <!-- Footer -->
+  <footer class="p-4 text-center text-sm text-slate-300 border-t border-slate-700 bg-slate-800/30 backdrop-blur">
+    <p>&copy; <span id="year"></span> WANOCRAFT. Made with ❤️ by Naz and Janz</p>
+  </footer>
 
-  <form id="uploadForm" class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-2xl shadow-lg max-w-xl w-full">
-    <div class="mb-5">
-      <label for="prompt" class="block text-blue-200 font-medium mb-2">Prompt</label>
-      <textarea id="prompt" rows="4" placeholder="Describe the prompt used to generate this image..." required></textarea>
-    </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-    <div class="mb-6">
-      <label for="image" class="block text-blue-200 font-medium mb-2">Upload Image</label>
-      <input type="file" id="image" accept="image/*" required />
-      <div id="previewContainer" class="mt-4"></div>
-    </div>
-
-    <div class="text-center">
-      <button type="submit" class="glow-btn">🚀 Upload</button>
-    </div>
-  </form>
-</main>
-
-<div id="successPopup"
-     class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium z-[9999] opacity-0 pointer-events-none transition-all duration-300">
-  ✅ Upload Successful!
-</div>
-
-<script>
-  const imageInput = document.getElementById("image");
-  const previewContainer = document.getElementById("previewContainer");
-
-  imageInput.addEventListener("change", () => {
-    const file = imageInput.files[0];
-    if (file && file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        previewContainer.innerHTML = `<img src="${reader.result}" alt="Preview Image" class="rounded-xl max-w-full max-h-80 border border-white/20 shadow-md" />`;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-
-  document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const prompt = document.getElementById("prompt").value.trim();
-    const imageFile = document.getElementById("image").files[0];
-    const popup = document.getElementById("successPopup");
-
-    if (!imageFile || !prompt) {
-      alert("Please fill all fields.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const imageData = reader.result;
-
-      try {
-        await window.addDoc(window.collection(window.firebaseDB, "uploads"), {
-          prompt,
-          image: imageData
-        });
-
-        popup.classList.remove("opacity-0", "pointer-events-none");
-        popup.classList.add("opacity-100");
-
-        setTimeout(() => {
-          popup.classList.add("opacity-0");
-          popup.classList.remove("opacity-100");
-          setTimeout(() => {
-            window.location.href = "index.html";
-          }, 300);
-        }, 2000);
-      } catch (err) {
-        alert("Upload failed. Try again.");
-        console.error("Error uploading to Firestore:", err);
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyBkdD-8QDgx8vvJAGTgw9L44N4lFYUpvdI",
+      authDomain: "wanocraft-87029.firebaseapp.com",
+      projectId: "wanocraft-87029",
+      storageBucket: "wanocraft-87029.appspot.com",
+      messagingSenderId: "906067247166",
+      appId: "1:906067247166:web:fed594ed763161659ed16f",
+      measurementId: "G-FPBWQKZMZK"
     };
-    reader.readAsDataURL(imageFile);
-  });
 
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-<footer class="mt-12 bg-slate-900/90 backdrop-blur text-slate-300 text-sm border-t border-slate-700">
-  <div class="max-w-screen-xl mx-auto px-6 py-8 flex flex-col items-center justify-center text-center gap-3">
-    <div class="flex items-center gap-2 justify-center">
-      <img src="pic.png" alt="WANOCRAFT Logo" class="w-8 h-8">
-      <span class="text-white font-semibold text-lg">WANOCRAFT</span>
-    </div>
-    <p>Made with ❤️ by Naz and Janz</p>
-    <p class="text-xs text-slate-400">&copy; <span id="year"></span> WANOCRAFT. All rights reserved.</p>
-  </div>
-</footer>
+    const imageInput = document.getElementById("image");
+    const previewContainer = document.getElementById("previewContainer");
+    const overlay = document.getElementById("uploadOverlay");
+    const uploadStatus = document.getElementById("uploadStatus");
 
+    imageInput.addEventListener("change", () => {
+      const file = imageInput.files[0];
+      if (file && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          previewContainer.innerHTML = `<img src="${reader.result}" alt="Preview Image" class="rounded-xl max-w-full max-h-64 mx-auto border border-white/20 shadow-md" />`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    window.handleUpload = async function(e) {
+      e.preventDefault();
+      const prompt = document.getElementById('prompt').value.trim();
+      const imageFile = document.getElementById('image').files[0];
+
+      if (!imageFile || !prompt) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        overlay.classList.remove("hidden");
+        uploadStatus.textContent = "Uploading... Please wait ⏳";
+
+        try {
+          await addDoc(collection(db, "uploads"), {
+            image: reader.result,
+            prompt
+          });
+
+          uploadStatus.textContent = "✅ Upload Successful! Redirecting...";
+          setTimeout(() => window.location.href = "index.html", 2000);
+
+        } catch (error) {
+          uploadStatus.textContent = "❌ Upload Failed. Please try again.";
+          setTimeout(() => overlay.classList.add("hidden"), 3000);
+        }
+      };
+      reader.readAsDataURL(imageFile);
+    };
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
