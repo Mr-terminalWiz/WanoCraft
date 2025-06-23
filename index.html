@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WANoCRAFT | AI Prompt Gallery</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #0f172a, #1e3a8a, #4f46e5);
+      font-family: 'Inter', sans-serif;
+      color: #f1f5f9;
+    }
+    header, footer {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+    }
+    .recreate-btn {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(to right, #3b82f6, #6366f1);
+      color: white;
+      font-size: 0.875rem;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+    .recreate-btn:hover {
+      filter: brightness(1.2);
+    }
+    #scrollTopBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #3b82f6;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 50;
+      display: none;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content img {
+      max-width: 90%;
+      max-height: 90vh;
+      border-radius: 0.5rem;
+    }
+    .close {
+      position: absolute;
+      top: 20px;
+      right: 35px;
+      color: white;
+      font-size: 32px;
+      cursor: pointer;
+    }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 10px 4px rgba(255, 0, 128, 0.3); transform: scale(1); }
+      50% { box-shadow: 0 0 20px 6px rgba(255, 0, 128, 0.6); transform: scale(1.05); }
+      100% { box-shadow: 0 0 10px 4px rgba(255, 0, 128, 0.3); transform: scale(1); }
+    }
+    .advertise-btn {
+      background: linear-gradient(90deg, #7c3aed, #ec4899);
+      animation: glowPulse 2.5s infinite;
+    }
+    .tooltip {
+      position: absolute;
+      top: -2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      color: #111827;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      z-index: 100;
+    }
+  </style>
+</head>
+<body class="text-white font-sans pt-20">
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 w-full z-50 p-4 flex justify-between items-center shadow-md bg-slate-900/90 backdrop-blur">
+    <div class="flex items-center gap-2">
+      <img src="pic.png" alt="Logo" class="w-8 h-8 sm:w-10 sm:h-10">
+      <h1 class="text-2xl font-bold text-white tracking-wide">WANoCRAFT</h1>
+    </div>
+    <a href="upload.html" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white transition font-medium shadow">
+      Upload Image
+    </a>
+  </header>
+
+  <!-- Ad Section -->
+  <section class="text-center text-sm text-slate-300 p-3 border-b border-slate-700 bg-slate-800/30 backdrop-blur">
+    <p>🔔 Sponsored: Place your ad here</p>
+    <div class="mt-2 h-16 flex items-center justify-center rounded border border-dashed border-slate-400 bg-slate-700/40">
+      Google Ads Slot
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="p-6 max-w-screen-xl mx-auto">
+    <div class="flex flex-col lg:flex-row gap-6">
+      <div class="flex-1">
+        <h2 class="text-xl font-medium mb-4 text-slate-100">Explore Community Uploads</h2>
+        <div id="gallery" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      </div>
+
+      <aside class="w-full lg:w-64 bg-slate-800/50 backdrop-blur rounded-lg p-4 border border-slate-600 text-slate-300">
+        <h3 class="font-semibold mb-3 text-white">Sponsored</h3>
+        <div class="h-52 bg-slate-700/50 mb-4 flex items-center justify-center rounded border border-dashed border-slate-500">Google Ad</div>
+        <div class="h-52 bg-slate-700/50 flex items-center justify-center rounded border border-dashed border-slate-500">Banner Ad</div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-10 p-4 text-center text-sm text-slate-300 border-t border-slate-700 bg-slate-800/30 backdrop-blur">
+    <p>No login required. Upload and recreate images freely.</p>
+    <div class="mt-2 h-16 flex items-center justify-center rounded border border-dashed border-slate-500 bg-slate-700/40">
+      Footer Ad Slot
+    </div>
+  </footer>
+
+  <!-- Scroll to Top -->
+  <button id="scrollTopBtn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' });">↑</button>
+
+  <!-- Modal for full image -->
+  <div id="imageModal" class="modal flex">
+    <span class="close" onclick="document.getElementById('imageModal').style.display='none'">&times;</span>
+    <div class="modal-content" id="modalImageContainer"></div>
+  </div>
+
+  <!-- Advertise Button -->
+  <a href="https://mail.google.com/mail/?view=cm&to=mrterfinslwiz@gmail.com&su=Need%20to%20Advertise"
+     target="_blank"
+     class="advertise-btn fixed bottom-5 left-5 z-[9999] text-white text-sm px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-all group">
+    ✉️ Advertise Here
+    <span class="tooltip group-hover:opacity-100">Place Your Ad Here!</span>
+  </a>
+
+  <!-- Firebase & Gallery Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBkdD-8QDgx8vvJAGTgw9L44N4lFYUpvdI",
+      authDomain: "wanocraft-87029.firebaseapp.com",
+      projectId: "wanocraft-87029",
+      storageBucket: "wanocraft-87029.appspot.com",
+      messagingSenderId: "906067247166",
+      appId: "1:906067247166:web:fed594ed763161659ed16f",
+      measurementId: "G-FPBWQKZMZK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const gallery = document.getElementById("gallery");
+
+    async function fetchImages() {
+      const querySnapshot = await getDocs(collection(db, "uploads"));
+      querySnapshot.forEach((doc) => {
+        const entry = doc.data();
+        const card = document.createElement("div");
+        card.className = "card relative";
+        const imageId = doc.id;
+
+        const likeKey = `likes-${imageId}`;
+        const likedKey = `liked-${imageId}`;
+        const likeCount = parseInt(localStorage.getItem(likeKey)) || 0;
+        const alreadyLiked = localStorage.getItem(likedKey) === "true";
+        const heartIcon = alreadyLiked ? "❤️" : "🤍";
+
+        card.innerHTML = `
+          <img src="${entry.image}" alt="Uploaded Image" class="w-full h-64 object-cover cursor-pointer" onclick="showFullImage('${entry.image}')">
+          <button onclick="recreate('${encodeURIComponent(entry.prompt)}')" class="recreate-btn">Recreate</button>
+          <div class="absolute top-2 right-2 flex items-center gap-1 bg-black/50 backdrop-blur px-2 py-1 rounded-full text-white text-sm">
+            <button onclick="toggleLike('${likeKey}', '${likedKey}', this)">${heartIcon}</button>
+            <span class="like-count">${likeCount}</span>
+          </div>
+        `;
+        gallery.appendChild(card);
+      });
+    }
+
+    fetchImages();
+
+    window.recreate = function(encodedPrompt) {
+      const url = `https://chat.openai.com/?model=gpt-4o&prompt=${encodedPrompt}`;
+      window.open(url, '_blank');
+    };
+
+    window.showFullImage = function(imageUrl) {
+      const modal = document.getElementById("imageModal");
+      const container = document.getElementById("modalImageContainer");
+      container.innerHTML = `<img src="${imageUrl}" alt="Full View">`;
+      modal.style.display = "flex";
+    };
+  </script>
+
+  <!-- Extra Scripts -->
+  <script>
+    document.getElementById("imageModal").addEventListener("click", function (e) {
+      if (e.target === this) this.style.display = "none";
+    });
+
+    const scrollBtn = document.getElementById("scrollTopBtn");
+    window.addEventListener("scroll", () => {
+      scrollBtn.style.display = window.scrollY > 300 ? "block" : "none";
+    });
+
+    function toggleLike(likeKey, likedKey, btnElement) {
+      const countEl = btnElement.nextElementSibling;
+      let count = parseInt(countEl.textContent) || 0;
+      const isLiked = localStorage.getItem(likedKey) === "true";
+
+      if (isLiked) {
+        count--;
+        btnElement.textContent = "🤍";
+        localStorage.removeItem(likedKey);
+      } else {
+        count++;
+        btnElement.textContent = "❤️";
+        localStorage.setItem(likedKey, "true");
+      }
+
+      countEl.textContent = count;
+      localStorage.setItem(likeKey, count);
+    }
+
+    window.onload = () => {
+      document.getElementById("year").textContent = new Date().getFullYear();
+    };
+  </script>
+
+  <!-- Footer -->
+  <footer class="mt-12 bg-slate-900/90 backdrop-blur text-slate-300 text-sm border-t border-slate-700">
+    <div class="max-w-screen-xl mx-auto px-6 py-8 flex flex-col items-center justify-center text-center gap-3">
+      <div class="flex items-center gap-2 justify-center">
+        <img src="pic.png" alt="WANOCRAFT Logo" class="w-8 h-8">
+        <span class="text-white font-semibold text-lg">WANOCRAFT</span>
+      </div>
+      <p>Made with ❤️ by Naz and Janz</p>
+      <p class="text-xs text-slate-400">&copy; <span id="year"></span> WANOCRAFT. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

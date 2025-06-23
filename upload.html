@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc
+    } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBkdD-8QDgx8vvJAGTgw9L44N4lFYUpvdI",
+      authDomain: "wanocraft-87029.firebaseapp.com",
+      projectId: "wanocraft-87029",
+      storageBucket: "wanocraft-87029.appspot.com",
+      messagingSenderId: "906067247166",
+      appId: "1:906067247166:web:fed594ed763161659ed16f",
+      measurementId: "G-FPBWQKZMZK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    window.firebaseDB = db;
+    window.addDoc = addDoc;
+    window.collection = collection;
+  </script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload | WANoCRAFT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #0f172a, #1e3a8a, #4f46e5);
+      font-family: 'Inter', sans-serif;
+      color: #f1f5f9;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+    }
+    main {
+      padding-top: 100px;
+    }
+    input, textarea {
+      background-color: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      color: #fff;
+      width: 100%;
+      outline: none;
+      transition: border 0.3s;
+    }
+    input:focus, textarea:focus {
+      border-color: #60a5fa;
+    }
+    .glow-btn {
+      background: linear-gradient(to right, #3b82f6, #6366f1);
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 2rem;
+      border-radius: 9999px;
+      margin-top: 1.5rem;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .glow-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(99, 102, 241, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+<header class="p-4 flex justify-between items-center">
+  <div class="flex items-center gap-2">
+    <img src="pic.png" alt="WANOCRAFT Logo" class="w-8 h-8 sm:w-10 sm:h-10" />
+    <h1 class="text-xl sm:text-2xl font-semibold text-white">WANoCRAFT</h1>
+  </div>
+  <a href="index.html" class="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-4 py-2 rounded-md shadow transition">
+    Back to Gallery
+  </a>
+</header>
+
+<main class="p-6 min-h-screen flex flex-col items-center justify-center">
+  <h2 class="text-3xl font-bold mb-6 text-center text-blue-100">Upload Your Creation</h2>
+
+  <form id="uploadForm" class="bg-white/5 backdrop-blur-lg border border-white/10 p-8 rounded-2xl shadow-lg max-w-xl w-full">
+    <div class="mb-5">
+      <label for="prompt" class="block text-blue-200 font-medium mb-2">Prompt</label>
+      <textarea id="prompt" rows="4" placeholder="Describe the prompt used to generate this image..." required></textarea>
+    </div>
+
+    <div class="mb-6">
+      <label for="image" class="block text-blue-200 font-medium mb-2">Upload Image</label>
+      <input type="file" id="image" accept="image/*" required />
+      <div id="previewContainer" class="mt-4"></div>
+    </div>
+
+    <div class="text-center">
+      <button type="submit" class="glow-btn">🚀 Upload</button>
+    </div>
+  </form>
+</main>
+
+<div id="successPopup"
+     class="fixed top-6 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg text-sm font-medium z-[9999] opacity-0 pointer-events-none transition-all duration-300">
+  ✅ Upload Successful!
+</div>
+
+<script>
+  const imageInput = document.getElementById("image");
+  const previewContainer = document.getElementById("previewContainer");
+
+  imageInput.addEventListener("change", () => {
+    const file = imageInput.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        previewContainer.innerHTML = `<img src="${reader.result}" alt="Preview Image" class="rounded-xl max-w-full max-h-80 border border-white/20 shadow-md" />`;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const prompt = document.getElementById("prompt").value.trim();
+    const imageFile = document.getElementById("image").files[0];
+    const popup = document.getElementById("successPopup");
+
+    if (!imageFile || !prompt) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const imageData = reader.result;
+
+      try {
+        await window.addDoc(window.collection(window.firebaseDB, "uploads"), {
+          prompt,
+          image: imageData
+        });
+
+        popup.classList.remove("opacity-0", "pointer-events-none");
+        popup.classList.add("opacity-100");
+
+        setTimeout(() => {
+          popup.classList.add("opacity-0");
+          popup.classList.remove("opacity-100");
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 300);
+        }, 2000);
+      } catch (err) {
+        alert("Upload failed. Try again.");
+        console.error("Error uploading to Firestore:", err);
+      }
+    };
+    reader.readAsDataURL(imageFile);
+  });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+<footer class="mt-12 bg-slate-900/90 backdrop-blur text-slate-300 text-sm border-t border-slate-700">
+  <div class="max-w-screen-xl mx-auto px-6 py-8 flex flex-col items-center justify-center text-center gap-3">
+    <div class="flex items-center gap-2 justify-center">
+      <img src="pic.png" alt="WANOCRAFT Logo" class="w-8 h-8">
+      <span class="text-white font-semibold text-lg">WANOCRAFT</span>
+    </div>
+    <p>Made with ❤️ by Naz and Janz</p>
+    <p class="text-xs text-slate-400">&copy; <span id="year"></span> WANOCRAFT. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>
