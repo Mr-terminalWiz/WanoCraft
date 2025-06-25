@@ -107,6 +107,9 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       z-index: 100;
     }
+    .group:hover .tooltip {
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="text-white font-sans pt-20">
@@ -157,13 +160,14 @@
     <div class="modal-content" id="modalImageContainer"></div>
   </div>
 
-  <a href="https://mail.google.com/mail/?view=cm&to=mrterminalwiz@gmail.com&su=Need%20to%20Advertise"
-     target="_blank"
-     class="advertise-btn fixed bottom-5 left-5 z-[9999] text-white text-sm px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-all group">
+  <!-- ✅ Working Advertise Button -->
+  <div id="advertiseBtn"
+    class="advertise-btn fixed bottom-5 left-5 z-[9999] text-white text-sm px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-all group cursor-pointer">
     ✉️ Advertise Here
-    <span class="tooltip group-hover:opacity-100">Place Your Ad Here!</span>
-  </a>
+    <span class="tooltip">Place Your Ad Here!</span>
+  </div>
 
+  <!-- ✅ Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
@@ -189,7 +193,6 @@
         const entry = doc.data();
         const card = document.createElement("div");
         card.className = "card relative";
-
         card.innerHTML = `
           <img src="${entry.image}" alt="Uploaded Image" class="w-full h-64 object-cover cursor-pointer" onclick="showFullImage('${entry.image}')">
           <button onclick="recreate('${encodeURIComponent(entry.prompt)}')" class="recreate-btn">Recreate</button>
@@ -201,8 +204,21 @@
     fetchImages();
 
     window.recreate = function(encodedPrompt) {
-      const url = `https://chat.openai.com/?model=gpt-4o&prompt=${encodedPrompt}`;
-      window.open(url, '_blank');
+      const prompt = decodeURIComponent(encodedPrompt);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        navigator.clipboard.writeText(prompt).then(() => {
+          alert("✅ Prompt copied! Open ChatGPT and paste it manually.");
+          window.open("https://chat.openai.com/", "_blank");
+        }).catch(() => {
+          alert("⚠️ Couldn’t copy the prompt. Please try manually.");
+          window.open("https://chat.openai.com/", "_blank");
+        });
+      } else {
+        const url = `https://chat.openai.com/?model=gpt-4o&prompt=${encodedPrompt}`;
+        window.open(url, '_blank');
+      }
     };
 
     window.showFullImage = function(imageUrl) {
@@ -212,6 +228,44 @@
       modal.style.display = "flex";
     };
   </script>
+
+  <!-- ✅ Working Email Button Script -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const advertiseBtn = document.getElementById("advertiseBtn");
+
+      advertiseBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        const email = "mrterminalwiz@gmail.com";
+        const subject = "Need to Advertise";
+        const mailto = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        if (isMobile) {
+          window.location.href = mailto;
+        } else {
+          const gmailUrl = `https://mail.google.com/mail/?view=cm&to=${email}&su=${encodeURIComponent(subject)}`;
+          const win = window.open(gmailUrl, "_blank");
+          setTimeout(() => {
+            if (!win || win.closed || typeof win.closed == "undefined") {
+              window.location.href = mailto;
+            }
+          }, 1000);
+        }
+      });
+    });
+  </script>
+
+  <footer class="mt-12 bg-slate-900/90 backdrop-blur text-slate-300 text-sm border-t border-slate-700">
+    <div class="max-w-screen-xl mx-auto px-6 py-8 flex flex-col items-center justify-center text-center gap-3">
+      <div class="flex items-center gap-2 justify-center">
+        <img src="pic.png" alt="WANOCRAFT Logo" class="w-8 h-8">
+        <span class="text-white font-semibold text-lg">WANOCRAFT</span>
+      </div>
+      <p>Made with ❤️ by Pixel Syndicate</p>
+      <p class="text-xs text-slate-400">&copy; <span id="year"></span> WANOCRAFT. All rights reserved.</p>
+    </div>
+  </footer>
 
   <script>
     document.getElementById("imageModal").addEventListener("click", function (e) {
@@ -228,15 +282,5 @@
     };
   </script>
 
-  <footer class="mt-12 bg-slate-900/90 backdrop-blur text-slate-300 text-sm border-t border-slate-700">
-    <div class="max-w-screen-xl mx-auto px-6 py-8 flex flex-col items-center justify-center text-center gap-3">
-      <div class="flex items-center gap-2 justify-center">
-        <img src="pic.png" alt="WANOCRAFT Logo" class="w-8 h-8">
-        <span class="text-white font-semibold text-lg">WANOCRAFT</span>
-      </div>
-      <p>Made with ❤️ by Pixel Syndicate</p>
-      <p class="text-xs text-slate-400">&copy; <span id="year"></span> WANOCRAFT. All rights reserved.</p>
-    </div>
-  </footer>
 </body>
 </html>
